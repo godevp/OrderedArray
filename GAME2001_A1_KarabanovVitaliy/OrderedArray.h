@@ -5,9 +5,10 @@ template <class t>
 class OrderedArray : public Array<t>
 {
 private:
-
+	bool duplicate = false;
+	bool allow;
 public:
-	OrderedArray(int size, int growBy = 1) : Array<t>(size, growBy)
+	OrderedArray(int size, bool allowDuplicate, int growBy = 1) : Array<t>(size, growBy), allow(allowDuplicate)
 	{
 	};
 
@@ -19,6 +20,7 @@ public:
 		assert(this->m_array != nullptr);
 		if (this->m_numElements >= this->m_maxSize)
 		{
+			if (allow || search(val) < 0)
 				this->Expand();
 		}
 
@@ -30,7 +32,18 @@ public:
 				break;
 		}
 
-		
+		if (!allow)
+		{
+			if (search(val) < 0)
+				duplicate = false;
+			else
+			{
+				duplicate = true;
+				std::cout << std::endl << " >>> You've entered number "<< val << " more than once, therefore, duplicates were deleted <<<" << std::endl << std::endl;
+			}
+		}
+		if (!duplicate || allow)
+		{
 			for (k = this->m_numElements; k > i; k--)
 			{
 				this->m_array[k] = this->m_array[k - 1];
@@ -38,9 +51,11 @@ public:
 
 			this->m_array[i] = val;
 
-			this->m_numElements++;	
+			this->m_numElements++;
+		}
 
 	};
+	
 
 	int search(t searchKey) override
 	{
